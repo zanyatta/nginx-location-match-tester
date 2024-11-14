@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="monetization" content="$ilp.uphold.com/zBQB7inAPafZ">
+<meta name="flattr:id" content="q56yr5">
+<link rel="stylesheet" href="./bootstrap.min.css" crossorigin="anonymous">
+<style>
+#config {
+	height: 20em;
+	font-family: monospace;
+}
+body {
+	background-color: #eee;
+}
+#footer {
+	margin-top: 5em;
+}
+</style>
+</head>
+<body onload="fill_defaults();">
+<div class="container-fluid">
+	<div class="page-header">
+		<h1>Nginx location match tester</h1>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="form-group">
+				<label for="config">Nginx configuration:</label>
+				<textarea id="config" class="form-control"></textarea>
+			</div>
+			<div class="form-group">
+				<label for="url">Tested URL:</label>
+				<input type="text" id="url" class="form-control" onkeypress="mayberun(event); return true;">
+			</div>
+			<div clasj="form-group">
+				<input type="button" class="btn btn-primary btn-lg" onclick="run(); return false;" value="Test">
+			</div>
+		</div>
+		<div class="col-md-6" id="result">
+		</div>
+	</div>
+
+	<div class="row" id="footer">
+		<small>Not supported yet: sub-locations, listen ports, nice parsing errors.</small>
+	</div>
+</div>
+
+<script src="./nginx.js"></script>
+<script>
+function fill_defaults() {
+	config = document.getElementById("config");
+	url = document.getElementById("url");
+	if (localStorage.last_config) {
+		config.value = localStorage.last_config;
+	} else {
+		config.value = "server {\n listen       80;\n server_name  domain2.com www.domain2.com;\n access_log   logs/domain2.access.log  main;\n \n location ~ ^/(images|javascript|js|css|flash|media|static)/\n {\n  root    /var/www/virtual/big.server.com/htdocs;\n  expires 30d;\n }\n\n location / {\n  proxy_pass      http://127.0.0.1:8080;\n }\n}";
+	}
+	if (localStorage.last_url) {
+		url.value = localStorage.last_url;
+	} else {
+		url.value = "http://domain2.com/images/";
+	}
+}
+function run() {
+	config = document.getElementById("config").value;
+	result = document.getElementById("result");
+	url = document.getElementById("url").value;
+	Nginx.runCheck(config, result, url);
+
+	localStorage.last_config = config;
+	localStorage.last_url = url;
+}
+function mayberun(ev) {
+	if (ev.key=="Enter") {
+		run();
+	}
+}
+</script>
+<script>
+  // var _paq = window._paq = window._paq || [];
+  // _paq.push(['trackPageView']);
+  // _paq.push(['enableLinkTracking']);
+  // (function() {
+  //   var u="//mtm.viraptor.info/";
+  //   _paq.push(['setTrackerUrl', u+'mtm']);
+  //   _paq.push(['setSiteId', '2']);
+  //   var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+  //   g.async=true; g.src=u+'mtm.js'; s.parentNode.insertBefore(g,s);
+  // })();
+</script>
+</body>
+</html>
